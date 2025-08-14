@@ -18,7 +18,7 @@ jobs:
     - name: Compile Verilog files
       run: |
         mkdir -p build
-        iverilog -o build/testbench.out src/*.v tb/*.v
+        iverilog -o build/testbench.out RTL/*.v TB/*.v
 
     - name: Run simulation
       run: |
