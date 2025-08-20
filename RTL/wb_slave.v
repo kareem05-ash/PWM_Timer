@@ -10,7 +10,7 @@ module wb_slave#
     // Prameters
         parameter mem_width = 16,                   // word width stored in register file
         parameter mem_depth = 12,                   // 4 entries (ctrl, period, divisor, DC) for each channel
-        parameter adr_widht = 16,                   // address width
+        parameter adr_width = 16                    // address width
 )
 (
     // Inputs
@@ -19,7 +19,7 @@ module wb_slave#
         input wire i_wb_cyc,                        // indicates valid bus cycle
         input wire i_wb_stb,                        // indicates valid data
         input wire i_wb_we,                         // if set, write operation. if reset, read operation.
-        input wire [adr_widht-1:0] i_wb_adr,        // address to write on it or read from it
+        input wire [adr_width-1:0] i_wb_adr,        // address to write on it or read from it
         input wire [mem_width-1:0] i_wb_data,       // input data to be written
     // Outpus
         output reg o_wb_ack,                        // indicates successful transaction (read or write)
@@ -40,7 +40,7 @@ module wb_slave#
                     for(i=0; i<mem_depth; i=i+1) begin
                         regfile[i] <= 0;            // set all registers to 0x00
                     end
-            end else if(i_wb_cyc & i_wb_stb) begin
+            end else if(i_wb_cyc && i_wb_stb && (i_wb_adr < mem_depth)) begin
                 // write operation
                     if(i_wb_we) begin                   
                         regfile[i_wb_adr] <= i_wb_data; 
@@ -49,7 +49,9 @@ module wb_slave#
                     end else begin                      
                         o_wb_data <= regfile[i_wb_adr];
                         o_wb_ack <= 1;              // indicates read operation's done successfully
-                    end
-            end 
+                    end 
+            end else begin
+                o_wb_ack <= 0;                      // deassert ack while no write or read operation
+            end
         end
 endmodule
