@@ -1,0 +1,20 @@
+	wb_interface module
+
+1. configurable memory {width, depth}.
+2. set we: write operation.
+3. reset we: read operation.
+4. for 1st channel: addresses {
+	ctrl => 0x00
+	period => 0x01
+	divisor => 0x02
+	DC => 0x03
+}
+	|
+ 	|
+  for 4th channel: addresses {
+	ctrl => 0x12
+	period => 0x13
+	divisor => 0x14
+	DC => 0x15
+}
+5. set wb_ack if a read or write operation is done
