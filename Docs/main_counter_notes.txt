@@ -11,7 +11,7 @@ NOTEs::
 Verification Scenarios::
     1. Reset behavior
     2. Run it in pwm mode to assert that it counts up to period_reg-1
-    3. Run it in timer mode to assert that it counts up to period_reg
-    4. Run it in timer mode and set ctrl[3] (cont mode) then assert that it counts up again if ctrl[2] is enabled
-    5. Run it in timer mode and reset ctrl[3] (one-shot mode) then assert that it hangs on 0 value
-    6. Reset during counting
+    3. Run it in timer mode and set ctrl[3] (cont mode) then assert that it counts up again if ctrl[2] is enabled
+    4. Run it in timer mode and reset ctrl[3] (one-shot mode) then assert that it hangs on 0 value
+    5. Reset during counting
+    6. Disable main_counter during counting. Assert that counter holds the past value
