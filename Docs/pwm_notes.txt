@@ -1,4 +1,4 @@
-========== pwm module ==========
+============================== pwm module ==============================
 NOTEs::
     1. This core works if pwm_en is set
     2. pwm_en = ctrl[1] & ctrl[2]   # mode-bit, main_count_en-bit 
@@ -11,4 +11,4 @@ Verification Scenarios::
     3. DC = 50%
     4. DC = 25%
     5. DC_reg > period_reg
-    6. assign different data for each channel and see behavior
+    6. Choose i_DC instead of DC_reg
