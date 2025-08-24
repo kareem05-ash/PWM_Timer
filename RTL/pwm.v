@@ -17,14 +17,17 @@ module pwm
         input wire [15:0] period_reg,                           // period register
         input wire [15:0] DC_reg,                               // duty cycle register
     // Outputs
-        output reg pwm                                          // pwm output
+        output wire pwm                                         // pwm output
 );
 
     // Internal Signals
         reg [15:0] period_reg_sync;
         reg [15:0] DC_reg_sync;
+        reg pwm_calc;                                           // calculated pwm signal
         wire [15:0] DC;                                         // chosen duty cycle
+    // Assign Wires
         assign DC = DC_sel? i_DC : DC_reg_sync;
+        assign pwm = (DC > period_reg_sync)? chosen_clk : pwm_calc;
 
     // Registers syncronization
         always@(posedge chosen_clk or posedge rst) begin
@@ -37,17 +40,15 @@ module pwm
             end
         end
 
-    // Logic
+    // pwm_calc Logic
         always@(posedge chosen_clk or posedge rst) begin
             if(rst) begin
-                pwm <= 1'b0;
+                pwm_calc <= 1'b0;
             end else if(pwm_en) begin
-                if(DC > period_reg_sync) begin          // DC > period handling 
-                    pwm <= chosen_clk;                  // output chosen_clk if DC > period
-                end else if(counter < period_reg_sync) begin
-                    pwm <= (counter < DC)? 1'b1 : 1'b0;
+                if(counter < period_reg_sync) begin
+                    pwm_calc <= (counter < DC)? 1'b1 : 1'b0;
                 end else begin
-                    pwm <= 1'b0;                        // reset the pwm output in case of counter exceedes the period register
+                    pwm_calc <= 1'b0;           // reset the pwm output in case of counter exceedes the period register
                 end  
             end
         end
