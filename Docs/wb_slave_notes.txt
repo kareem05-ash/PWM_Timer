@@ -17,9 +17,9 @@ NOTEs::
 		divisor => 0x14
 		DC => 0x15
 	}
-	5. set wb_ack if a read or write operation is done.
+	5. set wb_ack if a read or write operation's done.
 Verification Scenarios::
-	1. Reset behavior
-	2. Write to all registers
-	3. Read from all registers
-	
+	1. Functional Correctness (RESET behavior)
+	2. Functional Correctness (Write random data to all registers)
+	3. Functional Correctness (Read from all registers)
+	4. Corner Case (i_wb_adr >= mem_depth)
