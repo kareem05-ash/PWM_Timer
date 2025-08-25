@@ -11,6 +11,7 @@ module main_counter_tb();
         reg slow_clk;                               // +ve edge slow clk from clk_divider module
         reg rst;                                    // async +ve edge system rst (i_wb_rst)
         reg sw_rst;                                 // sync software rst signal: active-high level trig
+        reg irq_rst;                                // interrupt request rst
         reg counter_en;                             // ctrl[2]
         reg mode;                                   // ctrl[1]? pwm : timer mode
         reg timer_mode;                             // ctrl[3]? cont : one-shot
@@ -25,6 +26,7 @@ module main_counter_tb();
                 .slow_clk(slow_clk), 
                 .rst(rst), 
                 .sw_rst(sw_rst), 
+                .irq_rst(irq_rst),
                 .counter_en(counter_en), 
                 .mode(mode), 
                 .timer_mode(timer_mode), 
@@ -42,6 +44,7 @@ module main_counter_tb();
             task reset(); begin
                 rst = 1;                // apply system rst
                 sw_rst = 0;             // default value
+                irq_rst = 0;            // default value
                 counter_en = 0;         // default value
                 mode = 0;               // default value
                 timer_mode = 0;         // default value
@@ -95,7 +98,7 @@ module main_counter_tb();
     // Stimulus
         initial begin
             // 1st scenario Functional Correctness (RESET Behavior)
-                $display("\n==================== 1st scenario Functional Correctness (RESET Behavior) ====================");
+                $display("==================== 1st scenario Functional Correctness (RESET Behavior) ====================");
                 reset();
                 if(counter == 16'b0) begin
                     $display("[PASS] | counter = %d, expected = %d", counter, 16'b0);
@@ -103,14 +106,14 @@ module main_counter_tb();
                     $display("[FAIL] | counter = %d, expected = %d", counter, 16'b0);
                 end
             // 2nd scenario Functional Correctness (PWM mode full counting with period = 4)
-                $display("\n==================== 2nd scenario Functional Correctness (PWM mode full counting with period = 4) ====================");
+                $display("==================== 2nd scenario Functional Correctness (PWM mode full counting with period = 4) ====================");
                 reset();
                 counter_en = 1;         // enable counting
                 mode = 1;               // pwm mode
                 period_reg = 4;         // set preiod = 4 slow_clk cycles
                 pwm(period_reg);
             // 3rd scenario Functional Correctness (Timer mode full counting [continous] with period = 4)
-                $display("\n==================== 3rd scenario Functional Correctness (Timer mode full counting [continous] with period = 4) ====================");
+                $display("==================== 3rd scenario Functional Correctness (Timer mode full counting [continous] with period = 4) ====================");
                 reset();
                 counter_en = 1;         // enable counting
                 mode = 0;               // timer mode
@@ -119,7 +122,7 @@ module main_counter_tb();
                 @(negedge slow_clk);
                 timer_cont(period_reg);
             // 4th scenario Functional Correctness (Timer mode full counting [one-shot] with period = 4)
-                $display("\n==================== 4th scenario Functional Correctness (Timer mode full counting [one-shot] with period = 4) ====================");
+                $display("==================== 4th scenario Functional Correctness (Timer mode full counting [one-shot] with period = 4) ====================");
                 reset();
                 counter_en = 1;         // enable counting
                 mode = 0;               // timer mode
@@ -128,7 +131,7 @@ module main_counter_tb();
                 @(negedge slow_clk);
                 timer_one_shot(period_reg);
             // 5th scenario Corner Case (RESET during counting)
-                $display("\n==================== 5th scenario Corner Case (RESET during counting) ====================");
+                $display("==================== 5th scenario Corner Case (RESET during counting) ====================");
                 reset();
                 counter_en = 1;         // enable counting
                 mode = 1;               // pwm mode
@@ -141,7 +144,7 @@ module main_counter_tb();
                     $display("[FAIL] | counter = %d, expected = %d", counter, 16'b0);
                 end
             // 6th scenario Corner Case (Disable the counter while counting)
-                $display("\n==================== 6th scenario Corner Case (Disable the counter while counting) ====================");
+                $display("==================== 6th scenario Corner Case (Disable the counter while counting) ====================");
                 reset();
                 counter_en = 1;         // enable counting
                 mode = 1;               // pwm mode
@@ -154,6 +157,7 @@ module main_counter_tb();
                     else                $display("[PASS] | counter = %d, expected = %d", counter, 16'd5);
                 end
             // STOP Simulation
+                $display("==================== STOP Simulation ====================");
                 #100;
                 $stop;
         end 
