@@ -8,27 +8,30 @@
 `timescale 1ns/1ps
 module wb_slave_tb();
     // DUT Prameters
+        parameter num_ch = 4;                       // number of channels
         parameter mem_width = 16;                   // word width stored in register file
-        parameter mem_depth = 12;                   // 4 entries (ctrl, period, divisor, DC) for each channel
+        parameter mem_depth = 4 * num_ch;           // 4 entries (ctrl, period, divisor, DC) for each channel
         parameter adr_width = 16;                   // address width
     // DUT Inputs
-        reg i_wb_clk;                           // clk signal from the host
-        reg i_wb_rst;                           // async. active-high rst from the host
-        reg i_wb_cyc;                           // indicates valid bus cycle
-        reg i_wb_stb;                           // indicates valid data
-        reg i_wb_we;                            // if set, write operation. if reset, read operation.
-        reg [adr_width-1:0] i_wb_adr;           // address to write on it or read from it
-        reg [mem_width-1:0] i_wb_data;          // input data to be written
-    // DUT Outpus
-        wire o_wb_ack;                          // indicates successful transaction (read or write)
-        wire [mem_width-1:0] o_wb_data;         // output data read from register file
-    // Internal Signals
-        reg [15:0] data, adr;                   // internal register for assertions
-        integer i;                              // for loop counter
+        reg i_wb_clk;                               // clk signal from the host
+        reg i_wb_rst;                               // async. active-high rst from the host
+        reg i_wb_cyc;                               // indicates valid bus cycle
+        reg i_wb_stb;                               // indicates valid data
+        reg i_wb_we;                                // if set, write operation. if reset, read operation.
+        reg [num_ch-1:0] irq_flag;                  // itrrupt flag from timer module
+        reg [adr_width-1:0] i_wb_adr;               // address to write on it or read from it
+        reg [mem_width-1:0] i_wb_data;              // input data to be written
+    // DUT Outpus   
+        wire o_wb_ack;                              // indicates successful transaction (read or write)
+        wire [mem_width-1:0] o_wb_data;             // output data read from register file
+    // Internal Signals 
+        reg [15:0] data, adr;                       // internal register for assertions
+        integer i;                                  // for loop counter
     // Local Parameters
         localparam clk_period = 20;
     // DUT Instantiation
         wb_slave #(
+            .num_ch(num_ch),
             .mem_width(mem_width), 
             .mem_depth(mem_depth), 
             .adr_width(adr_width)
@@ -39,6 +42,7 @@ module wb_slave_tb();
             .i_wb_cyc(i_wb_cyc), 
             .i_wb_stb(i_wb_stb), 
             .i_wb_we(i_wb_we), 
+            .irq_flag(irq_flag),
             .i_wb_adr(i_wb_adr), 
             .i_wb_data(i_wb_data), 
             .o_wb_ack(o_wb_ack), 
@@ -56,6 +60,7 @@ module wb_slave_tb();
                 i_wb_cyc = 0;           // default value
                 i_wb_stb = 0;           // default value
                 i_wb_we = 0;            // default value
+                irq_flag = 0;           // default value
                 i_wb_adr = 0;           // default value
                 i_wb_data = 0;          // default value
                 @(negedge i_wb_clk);    // waits for a clk cycle to track rst signal
