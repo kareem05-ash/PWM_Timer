@@ -89,7 +89,23 @@ module timer_tb();
             // 2nd scenario Functional Correctness (cont. mode, period = 4)
                 $display("==================== 2nd scenario Functional Correctness (cont. mode, period = 4) ====================");
                 reset();
-                assert_timer(16'd4, 1'd1);
+                period_reg = 16'd4;    // assign period register
+                @(posedge chosen_clk);  // waits to synchronize preiod_reg
+                counter_en = 1;
+                timer_en = 1;           // enables the core
+                timer_mode = 1'd1;      // set timer mode
+                @(negedge chosen_clk);
+                @(negedge chosen_clk);  // waits for a clk cycle to capture data
+                repeat(period_reg+1) begin
+                    if(!timer & !irq_flag)  $display("[PASS] | timer = %d, expected = %d, irq_flag = %d, expected = %d, counter = %d", timer, 1'd0, irq_flag, 1'd0, counter);
+                    else                    $display("[FAIL] | timer = %d, expected = %d, irq_flag = %d, expected = %d, counter = %d", timer, 1'd0, irq_flag, 1'd0, counter);
+                    @(negedge chosen_clk);
+                end
+                if(timer & irq_flag)        $display("[PASS] | timer = %d, expected = %d, irq_flag = %d, expected = %d, counter = %d", timer, 1'd1, irq_flag, 1'd1, counter);
+                else                        $display("[FAIL] | timer = %d, expected = %d, irq_flag = %d, expected = %d, counter = %d", timer, 1'd1, irq_flag, 1'd1, counter);
+                @(negedge chosen_clk);
+                if(!timer & irq_flag)       $display("[PASS] | timer = %d, expected = %d, irq_flag = %d, expected = %d, counter = %d", timer, 1'd0, irq_flag, 1'd1, counter);
+                else                        $display("[FAIL] | timer = %d, expected = %d, irq_flag = %d, expected = %d, counter = %d", timer, 1'd0, irq_flag, 1'd1, counter); 
             // 3rd scenario Functional Correctness (one-shot mode, period = 4)
                 $display("==================== 3rd scenario Functional Correctness (one-shot mode, period = 4) ====================");
                 reset();
