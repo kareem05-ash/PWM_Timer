@@ -107,18 +107,18 @@ module pwm_tb();
             // 2nd scenario Functional Correctness (DC_reg = 50 percent)
                 $display("==================== 2nd scenario Functional Correctness (DC_reg = 50 percent) ====================");
                 reset();
-                pwm_en = 1; DC_sel = 0; i_DC = 0;   period_reg = 6; DC_reg = 3; 
+                pwm_en = 1; DC_sel = 0; i_DC = 0;   period_reg = 6; DC_reg = 3; @(negedge slow_clk);
                 assert_pwm(period_reg, DC_reg);
             // 3rd scenario Functional Correctness (DC_reg = 25 percent)
                 $display("==================== 3rd scenario Functional Correctness (DC_reg = 25 percent) ====================");
                 reset();
-                pwm_en = 1; DC_sel = 0; i_DC = 0;   period_reg = 4; DC_reg = 1; 
+                pwm_en = 1; DC_sel = 0; i_DC = 0;   period_reg = 4; DC_reg = 1; @(negedge slow_clk);
                 assert_pwm(period_reg, DC_reg);
-            // 4th scenario Functional Correctness (DC_reg = 75 percent)
-                $display("==================== 4th scenario Functional Correctness (DC_reg = 75 percent) ====================");
+            // 4th scenario Functional Correctness (i_DC = 75 percent)
+                $display("==================== 4th scenario Functional Correctness (i_DC = 75 percent) ====================");
                 reset();
-                pwm_en = 1; DC_sel = 0; i_DC = 0;   period_reg = 4; DC_reg = 3; 
-                assert_pwm(period_reg, DC_reg);
+                pwm_en = 1; DC_sel = 1; i_DC = 3;   period_reg = 4; DC_reg = 0; @(negedge slow_clk);
+                assert_pwm(period_reg, i_DC);
             // 5th scenario Corner Case ([DC=4] > [period=3])
                 $display("==================== 5th scenario Corner Case ([DC=4] > [period=3]) ====================");
                 reset();
