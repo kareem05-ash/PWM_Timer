@@ -56,6 +56,7 @@ module down_clk_tb();
             $display("\n=================== 2nd scenario Functional Correctness (even divisor_reg = 4) ====================");
             reset();            //now, slow_clk = 0
             divisor_reg = 4;      //even divisor
+            @(negedge chosen_clk);
             repeat(4/2)         //now, slow_clk should be 1 
                 @(negedge chosen_clk);
             if(slow_clk)
@@ -74,6 +75,7 @@ module down_clk_tb();
             $display("\n=================== 3rd scenario Fuctional Correctness (odd divisor_reg = 5) ====================");
             reset();            //now, slow_clk = 0
             divisor_reg = 5;      //odd divisor
+            @(negedge chosen_clk);
             repeat(((5-1)/2) + 1)   //waits for divisor_reg_shifted + 1 chosen_clk cycles to maintain posedeg of slow_clk
                 @(negedge chosen_clk);
             if(slow_clk)
@@ -112,6 +114,7 @@ module down_clk_tb();
             $display("\n=================== 6th scenario Corner Case (even divisor_reg = 100) ====================");
             reset();            //now, slow_clk = 0
             divisor_reg = 100;    //even divisor
+            @(negedge chosen_clk);
             repeat(100/2)       //now, slow_clk should be 1 
                 @(negedge chosen_clk);
             if(slow_clk)
@@ -130,6 +133,7 @@ module down_clk_tb();
             $display("\n=================== 7th scenario Corner Case (odd divisor_reg = 101) ====================");
             reset();            //now, slow_clk = 0
             divisor_reg = 101;    //odd divisor
+            @(negedge chosen_clk);
             repeat(((101-1)/2) + 1) //waits for divisor_reg_shifted + 1 chosen_clk cycles to maintain posedeg of slow_clk
                 @(negedge chosen_clk);
             if(slow_clk)
