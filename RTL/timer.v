@@ -12,17 +12,23 @@ module timer
 );
     // Internal Signals
         reg [15:0] period_reg_sync;                             // synchronous period register
+        reg timer_en_sync;
     // Register Synchronization
         always@(posedge chosen_clk or posedge rst) begin
-            if(rst) period_reg_sync <= 0;
-            else    period_reg_sync <= period_reg;
+            if(rst) begin
+                period_reg_sync <= 0;
+                timer_en_sync <= 0;
+            end else begin
+                period_reg_sync <= period_reg;
+                timer_en_sync <= timer_en;
+            end   
         end
     // Timer Logic
         always@(posedge chosen_clk or posedge rst) begin
             if(rst) begin
                 timer <= 0;
                 irq_flag <= 0;
-            end else if(timer_en) begin
+            end else if(timer_en_sync) begin
                 if(counter >= period_reg_sync) begin
                     timer <= 1'b1;
                     irq_flag <= 1'b1;

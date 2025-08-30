@@ -23,20 +23,26 @@ module pwm
     // Internal Signals
         reg [15:0] period_reg_sync;
         reg [15:0] DC_reg_sync;
+        reg pwm_en_sync;
+        reg DC_sel_sync;
         reg pwm_calc;                                           // calculated pwm signal
         wire [15:0] DC;                                         // chosen duty cycle
     // Assign Wires
-        assign DC = DC_sel? i_DC : DC_reg_sync;
+        assign DC = DC_sel_sync? i_DC : DC_reg_sync;
         assign pwm = (DC > period_reg_sync)? chosen_clk : pwm_calc;
 
     // Registers syncronization
         always@(posedge chosen_clk or posedge rst) begin
             if(rst) begin
                 period_reg_sync <= 0;
-                DC_reg_sync <= 0;   
+                DC_reg_sync <= 0;  
+                pwm_en_sync <= 0;
+                DC_sel_sync <= 0; 
             end else begin
                 period_reg_sync <= period_reg;
                 DC_reg_sync <= DC_reg;
+                pwm_en_sync <= pwm_en;
+                DC_sel_sync <= DC_sel; 
             end
         end
 
@@ -44,7 +50,7 @@ module pwm
         always@(posedge chosen_clk or posedge rst) begin
             if(rst) begin
                 pwm_calc <= 1'b0;
-            end else if(pwm_en) begin
+            end else if(pwm_en_sync) begin
                 if(counter < period_reg_sync) begin
                     pwm_calc <= (counter < DC)? 1'b1 : 1'b0;
                 end else begin

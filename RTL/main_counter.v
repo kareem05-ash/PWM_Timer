@@ -14,39 +14,58 @@ module main_counter
 );
     // Internal Signals
         reg [15:0] period_reg_sync;                     // period register synchronous with slow_clk (essential in case of i_extclk is chosen instead of i_wb_clk)
+        reg sw_rst_sync;
+        reg irq_rst_sync;
+        reg counter_en_sync;
+        reg mode_sync;
+        reg timer_mode_sync;
         reg mode_prev;                                  // holds the previousv mode
-        reg [1:0]counts;                                // flag indicates that the one-shot mode is done
+        reg counts;                                     // flag indicates that the one-shot mode is done
     // Register Synchronization
         always@(posedge slow_clk or posedge rst) begin
-            if(rst) period_reg_sync <= 16'b0;           // reset the register
-            else    period_reg_sync <= period_reg;      // load the rgister from register file (period_reg)
+            if(rst) begin
+                period_reg_sync <= 16'b0;           // reset the register
+                sw_rst_sync <= 0;
+                irq_rst_sync <= 0;
+                counter_en_sync <= 0;
+                mode_sync <= 0;
+                timer_mode_sync <= 0;
+            end
+            else begin
+                period_reg_sync <= period_reg;      // load the rgister from register file (period_reg)
+                sw_rst_sync <= sw_rst;
+                irq_rst_sync <= irq_rst;
+                counter_en_sync <= counter_en;
+                mode_sync <= mode;
+                timer_mode_sync <= timer_mode; 
+            end
         end 
     // counter logic
         always@(posedge slow_clk or posedge rst) begin
-            if(rst || sw_rst) begin
+            if(rst || sw_rst_sync) begin
                 counter <= 16'b0; 
                 mode_prev <= 1'b0; 
                 counts <= 1'b0;
             end else begin
                 // reset the counter right after changing mode from pwm to timer    
-                    if(!mode && mode_prev)  counter <= 16'b0; 
+                    if(!mode_sync && mode_prev)  counter <= 16'b0; 
                 // clear interrupt request
-                    if(!irq_rst)    counts <= 1'b0;             // recount if in timer one-shot mode
+                    if(!irq_rst_sync)    counts <= 1'b0;             // recount if in timer one-shot mode
                 // incrementation
-                    if(counter_en) begin                        // if not enabled, counter will stop running (stores the past value)
-                        if(mode) begin      // PWM Mode
+                    if(counter_en_sync) begin                        // if not enabled, counter will stop running (stores the past value)
+                        if(mode_sync) begin      // PWM Mode
                             if(counter < period_reg_sync-1) begin
                                 counter <= counter + 1;         // increment the counter
                             end else begin
                                 counter <= 16'b0;               // reset the counter (roll over) if it's enabled
                             end
                         end else begin      // Timer Mode
-                            if(!timer_mode && counts == 2) begin
+                            if(!timer_mode_sync && counts) begin
                                 counter <= 16'b0;               // stop running if in one-shot mode
                             end else begin
                                 if(counter >= period_reg_sync) begin
+                                    counts <= 1'b1;             // raise up one-shot flag   
                                     counter <= 16'b0;           // reset the counter (roll over) it ti's enabled
-                                    counts <= counts + 1;       // raise up one-shot flag   
                                 end else begin
                                     counter <= counter + 1;     // increment the counter
                                 end
@@ -56,7 +75,7 @@ module main_counter
                         counter <= counter;                     // stores the past value
                     end
                 // update previous mode
-                    mode_prev <= mode;
+                    mode_prev <= mode_sync;
             end
         end
 endmodule
