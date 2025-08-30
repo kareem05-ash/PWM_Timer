@@ -44,7 +44,7 @@ module main_counter_tb();
             task reset(); begin
                 rst = 1;                // apply system rst
                 sw_rst = 0;             // default value
-                irq_rst = 0;            // default value
+                irq_rst = 1;            // default value
                 counter_en = 0;         // default value
                 mode = 0;               // default value
                 timer_mode = 0;         // default value
@@ -111,6 +111,7 @@ module main_counter_tb();
                 counter_en = 1;         // enable counting
                 mode = 1;               // pwm mode
                 period_reg = 4;         // set preiod = 4 slow_clk cycles
+                @(negedge slow_clk);
                 pwm(period_reg);
             // 3rd scenario Functional Correctness (Timer mode full counting [continous] with period = 4)
                 $display("==================== 3rd scenario Functional Correctness (Timer mode full counting [continous] with period = 4) ====================");
@@ -161,4 +162,5 @@ module main_counter_tb();
                 #100;
                 $stop;
         end 
+    initial $monitor("counts = %d", DUT.counts);
 endmodule
