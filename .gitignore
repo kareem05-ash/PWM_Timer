@@ -64,3 +64,6 @@ Thumbs.do
 # *.hex
 # *.txt
 *.bkp
+
+# Others
+PWM_Timer/
