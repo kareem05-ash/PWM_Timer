@@ -1,0 +1,17 @@
+============================== main_counter module ==============================
+NOTEs::
+    1. It's a general counter which feeds pwm and timers cores
+    2. In pwm mode, counter counts from 0 up to period_reg-1
+    3. In timer mode, counter counts from 0 up to period_reg
+    4. When changing from pwm to timer mode, counter must be reset (counter = 0)
+    5. The counter can be reset (counter = 0) by applying system rst (i_wb_rst) or setting ctrl[7]
+    6. input clk (slow_clk) can be divided before entering main_counter module by dividing its frequncy by divisor_reg (16-bit divisor)
+    7. If main_counter enable-bit (ctrl[2]) is reset, the counter will stop runnign. It doesn't have to be reset(counter = 0)
+    8. In timer mode, if ctrl[3] is set (cont mode), the counter will start counting again. If ctrl[3] is reset, the counter will hang on 0 value
+Verification Scenarios::
+    1. Reset behavior
+    2. Run it in pwm mode to assert that it counts up to period_reg-1
+    3. Run it in timer mode and set ctrl[3] (cont mode) then assert that it counts up again if ctrl[2] is enabled
+    4. Run it in timer mode and reset ctrl[3] (one-shot mode) then assert that it hangs on 0 value
+    5. Reset during counting
+    6. Disable main_counter during counting. Assert that counter holds the past value

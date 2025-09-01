@@ -1,0 +1,14 @@
+============================== pwm module ==============================
+NOTEs::
+    1. This core works if pwm_en is set
+    2. pwm_en = ctrl[1] & ctrl[2]   # mode-bit, main_count_en-bit 
+    3. If main_count_en ctrl[2] is low, the counter will stop running and pwm output will hold the past value until main counter starts again
+    4. Duty Cycle can be chosen between register DC or external i_DC
+    5. DC = ctrl[6]? i_DC : DC_reg;
+Verification Scenarios::
+    1. Functional Correctness (RESET Behavior)
+    2. Functional Correctness (DC_reg = 50 percent)
+    3. Functional Correctness (DC_reg = 25 percent)
+    4. Functional Correctness (DC_reg = 75 percent)
+    5. Corner Case ([DC=4] > [period=3])
+    6. Corner Case (choose external [i_DC=3] > [period=2])
