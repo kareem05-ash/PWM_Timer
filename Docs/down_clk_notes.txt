@@ -1,9 +1,0 @@
-============================== down_clk module ==============================
-Verification Scenarios::
-    1. Functional Correctness (Reset Behavior)
-    2. Functional Correctness (even divisor_reg = 4)
-    3. Fuctional Correctness (odd divisor_reg = 5)
-    4. Corner Case (Error Handling : divisor_reg = 0)
-    5. Corner Case (Error Handling : divisor_reg = 1)
-    6. Corner Case (even divisor_reg = 100)
-    7. Corner Case (odd divisor_reg = 101)
